@@ -7,6 +7,30 @@ const ethConversionRate = ref(null)
 const assetValue = ref(null)
 const btcConversion = ref(0)
 const ethConversion = ref(0)
+const conversions = ref([
+  { 
+    currency: "BTC",
+    allocation: 0.7
+  },
+  {
+    currency: "ETH", 
+    allocation: 0.3
+  },
+  {
+    currency: "",
+    allocation: 0
+  },
+  {
+    currency: "",
+    allocation: 0
+  },
+  {
+    currency: "",
+    allocation: 0
+  }
+])
+
+const haveCalculated = ref(false)
 
 // conversion data fetch
 async function fetchData() {
@@ -28,14 +52,13 @@ watch(incomingConversionData, updateConversionRates)
 
 // use converstion data to calculate end values
 function calculateValues() {
-  console.log("value is changing")
+  haveCalculated.value = true
   const btcAllocation = assetValue.value * .7
   const ethAllocation = assetValue.value * .3
 
   btcConversion.value = btcAllocation * btcConversionRate.value
   ethConversion.value = ethAllocation * ethConversionRate.value
 }
-// watch(assetValue, calculateValues)
 
 </script>
 
@@ -46,11 +69,14 @@ function calculateValues() {
     </div>
     <div class="formContainer">
       <div class="inputContainer">
-        <div class="calcTitle">Investable Assets</div>
+        <div class="calcTitle">Please Enter Your Desired Investment</div>
         <input v-model="assetValue" placeholder="Input fund quantity (USD)" >
         <button class="calculateButton" @click="calculateValues">calculate!</button>
       </div>
-      <div class="outputContainer">
+      <div 
+        class="outputContainer"
+        v-if="haveCalculated"
+      >
         <div class="valueContainer">
           <div class="calcTitle">70% BTC Allocation</div>
           <div class="calcValue">
@@ -65,7 +91,10 @@ function calculateValues() {
         </div>
       </div>
     </div>
-    <div class="disclaimer">*With the volatile nature of crypto markets/pricing in mind, these calculations are approximate. Please leave room for fluctuations, surcharges, or other surprises. This is not financial advice.</div>
+    <div class="disclaimer" v-if="haveCalculated">
+      *With the volatile nature of crypto markets/pricing in mind, these calculations are approximate.
+      Please leave room for fluctuations, surcharges, or other surprises. This is not financial advice.
+    </div>
   </div>
 </template>
 
@@ -91,7 +120,7 @@ function calculateValues() {
   }
 }
 .formContainer {
-  margin-top: 30px;
+  margin: 30px auto 0px;
   display: flex;
   flex-direction: row;
   /* justify-content: center; */
