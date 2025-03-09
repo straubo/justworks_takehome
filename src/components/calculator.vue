@@ -7,6 +7,7 @@ const ethConversionRate = ref(null)
 const assetValue = ref(null)
 const btcConversion = ref(0)
 const ethConversion = ref(0)
+const inputLabel = ref("Please Enter Your Desired Investment (in USD)")
 const conversions = ref([
   { 
     currency: "BTC",
@@ -30,6 +31,8 @@ const conversions = ref([
   }
 ])
 
+const updatedInputLabel = "Calculate another amount (in USD)"
+
 const haveCalculated = ref(false)
 
 // conversion data fetch
@@ -49,7 +52,6 @@ function updateConversionRates() {
 
 watch(incomingConversionData, updateConversionRates)
 
-
 // use converstion data to calculate end values
 function calculateValues() {
   haveCalculated.value = true
@@ -58,6 +60,7 @@ function calculateValues() {
 
   btcConversion.value = btcAllocation * btcConversionRate.value
   ethConversion.value = ethAllocation * ethConversionRate.value
+  inputLabel.value = updatedInputLabel
 }
 
 </script>
@@ -69,9 +72,19 @@ function calculateValues() {
     </div>
     <div class="formContainer">
       <div class="inputContainer">
-        <div class="calcTitle">Please Enter Your Desired Investment</div>
-        <input v-model="assetValue" placeholder="Input fund quantity (USD)" >
-        <button class="calculateButton" @click="calculateValues">calculate!</button>
+        <div class="calcTitle">{{ inputLabel }}</div>
+        <input 
+          v-model="assetValue" 
+          placeholder="Input fund quantity (USD)"
+          type="number"
+        >
+        <transition name="fade">
+          <button 
+            class="calculateButton" 
+            @click="calculateValues"
+            v-if="assetValue"
+          >Calculate</button>
+        </transition>
       </div>
       <div 
         class="outputContainer"
@@ -99,9 +112,11 @@ function calculateValues() {
 </template>
 
 <style scoped>
+
 .appContainer {
   width: 90%;
-  max-width: 864px;
+  max-width: 928px;
+  height: 80vh;
   margin: 0 auto;
   padding: 36px;
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -110,8 +125,10 @@ function calculateValues() {
   @media (max-width: 500px) {
     width: 98%;
     padding: 4px;
+    height: 40vh;
   }
 }
+
 .header {
   font-size: 64px;
   font-weight: bold;
@@ -119,26 +136,56 @@ function calculateValues() {
     font-size: 24px;
   }
 }
+
 .formContainer {
   margin: 30px auto 0px;
   display: flex;
   flex-direction: row;
-  /* justify-content: center; */
   justify-content: space-around;
   width: 75%;
   @media (max-width:500px) {
     width: 95%;
+    flex-direction: column;
   }
 }
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 15vh;
+}
+
+.inputContainer input {
+  display: block;
+  height: 32px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.inputContainer input[type="number"]::-webkit-inner-spin-button,
+.inputContainer input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .calculateButton {
-  margin-left: 10px;
   background-color: white;
   border-radius: 4px;
 }
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
 .formCalculator {
   display: flex;
   flex-direction: row;
 }
+
 .calcValue {
   width: 100%; 
   height: 36px;
@@ -147,13 +194,16 @@ function calculateValues() {
   border: 1px solid black;
   border-radius: 5px;
 }
+
 .disclaimer {
   margin: 36px 0 0 16px;
   font-style: italic;
   width: 40%;
+  font-size: 16px;
   @media  (max-width: 500px) {
     width: 90%;
     margin: 30px auto 0;
+    font-size: 12px;
   }
 }
 </style>
