@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
+import allocationAdjustor from './allocationAdjustor.vue'
 
 // init variables, etc
 const assetValue = ref(null)
@@ -7,9 +8,9 @@ const incomingConversionData = ref(null)
 const currencies = ref(["BTC", "ETH"])
 const conversionRates = ref([0, 0])
 const finalConversions = ref([0, 0])
-const conversionOne = ref(0)
-const conversionTwo = ref(0)
+const allocations = ref([.7, .3])
 const inputLabel = ref("Investable Funds (USD)")
+const adjustingAllocations = ref(false)
 
 const updatedInputLabel = "Calculate another amount (in USD)"
 
@@ -35,15 +36,14 @@ watch(incomingConversionData, updateConversionRates)
 // use converstion data to calculate end values
 function calculateValues() {
   haveCalculated.value = true
-  const btcAllocation = assetValue.value * .7
-  const ethAllocation = assetValue.value * .3
+  const btcAllocation = assetValue.value * allocations.value[0]
+  const ethAllocation = assetValue.value * allocations.value[1]
 
-  conversionOne.value = btcAllocation * conversionRates.value[0]
   finalConversions.value[0] = btcAllocation * conversionRates.value[0]
-  conversionTwo.value = ethAllocation * conversionRates.value[1]
+  finalConversions.value[1] = ethAllocation * conversionRates.value[1]
   inputLabel.value = updatedInputLabel
-  console.log(incomingConversionData.value.data.rates[currencies.value[0]])
-  console.log(incomingConversionData.value.data.rates[currencies.value[1]])
+  // console.log(incomingConversionData.value.data.rates[currencies.value[0]])
+  // console.log(incomingConversionData.value.data.rates[currencies.value[1]])
 }
 
 </script>
@@ -81,7 +81,7 @@ function calculateValues() {
         class="outputContainer"
         v-if="haveCalculated"
       >
-      <div class="valuesHeader">Distributions</div>
+        <div class="valuesHeader">Distributions</div>
         <div class="valueContainer">
           <div class="calcTitle">70% BTC Allocation</div>
           <div class="calcValue">
@@ -91,9 +91,15 @@ function calculateValues() {
         <div class="valueContainer">
           <div class="calcTitle">30% ETH Allocation</div>
           <div class="calcValue">
-            {{ conversionTwo || "no input yet" }}
+            {{ finalConversions[1] || "no input yet" }}
           </div>
         </div>
+        <allocationAdjustor 
+          :exchangeData="incomingConversionData"
+          :currencies="currencies"
+          :conversionRates="conversionRates"
+          :allocations="allocations"
+        />
       </div>
     </div>
     <div class="disclaimer" v-if="haveCalculated">
@@ -101,7 +107,6 @@ function calculateValues() {
       Please leave room for fluctuations, surcharges, or other surprises. This is not financial advice.
     </div>
   </div>
-  <div>second number: {{ finalConversions[0] }}</div>
 </template>
 
 <style scoped>
@@ -110,6 +115,7 @@ function calculateValues() {
   width: 90%;
   max-width: 928px;
   height: 80vh;
+  background-color: rgba(194, 194, 194, 0.678);
   margin: 0 auto;
   padding: 36px;
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
