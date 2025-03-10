@@ -42,10 +42,19 @@ function calculateValues() {
   finalConversions.value[0] = btcAllocation * conversionRates.value[0]
   finalConversions.value[1] = ethAllocation * conversionRates.value[1]
   inputLabel.value = updatedInputLabel
+  // helpful for checking calcs
   // console.log(incomingConversionData.value.data.rates[currencies.value[0]])
   // console.log(incomingConversionData.value.data.rates[currencies.value[1]])
 }
 
+function togglePositionAdjustor() {
+  adjustingAllocations.value = !adjustingAllocations.value
+}
+function handleUpdateCurrency({ index, newCurrency }) {
+  currencies.value[index] = newCurrency
+}
+watch(currencies, updateConversionRates, { deep: true })
+watch(conversionRates, calculateValues, { deep: true })
 </script>
 
 <template>
@@ -81,21 +90,22 @@ function calculateValues() {
         class="outputContainer"
         v-if="haveCalculated"
       >
-        <div class="valuesHeader">Distributions</div>
+        <div class="valuesHeader">Distributions:</div>
         <div class="valueContainer">
-          <div class="calcTitle">70% BTC Allocation</div>
+          <div class="calcTitle">70% {{ currencies[0] }} Allocation</div>
           <div class="calcValue">
             {{ finalConversions[0] || "no input yet" }}
           </div>
         </div>
         <div class="valueContainer">
-          <div class="calcTitle">30% ETH Allocation</div>
+          <div class="calcTitle">30% {{ currencies[1] }} Allocation</div>
           <div class="calcValue">
             {{ finalConversions[1] || "no input yet" }}
           </div>
         </div>
         <button
           class="adjustButton"
+          @click="togglePositionAdjustor"
         >Adjust Positions</button>
         <allocationAdjustor
           v-if="adjustingAllocations"
@@ -103,6 +113,8 @@ function calculateValues() {
           :currencies="currencies"
           :conversionRates="conversionRates"
           :allocations="allocations"
+          @xButtonClicked="togglePositionAdjustor"
+          @updateCurrency="handleUpdateCurrency"
         />
       </div>
     </div>
@@ -116,7 +128,7 @@ function calculateValues() {
 <style scoped>
 
 .appContainer {
-  width: 90%;
+  width: 94%;
   max-width: 928px;
   height: 80vh;
   background-color: rgba(194, 194, 194, 0.678);
@@ -131,6 +143,7 @@ function calculateValues() {
     width: 98%;
     padding: 4px;
     height: auto;
+    min-height: 40vh;
     max-height: 90vh;
     overflow-y: scroll;
   }
@@ -160,7 +173,6 @@ function calculateValues() {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  /* height: 15vh; */
 }
 
 .inputContainer input {
@@ -168,6 +180,11 @@ function calculateValues() {
   height: 32px;
   text-align: center;
   border-radius: 4px;
+  margin-top: 16px;
+  @media (max-width:500px) {
+    width: 98%;
+    margin: 16px auto;
+  }
 }
 
 .inputContainer input[type="number"]::-webkit-inner-spin-button,
@@ -195,9 +212,6 @@ function calculateValues() {
 .calculateButton {
   background-color: white;
   border-radius: 4px;
-  /* width: 100%; */
-  /* this ^^ fixed positioning issue, but created a
-  sizing issue -refine if we have time */
   @media (max-width: 500px) {
     margin-top: 8px;
   }
@@ -219,14 +233,23 @@ function calculateValues() {
 }
 
 .outputContainer {
+  margin-top: 24px;
 
 }
 
 .valuesHeader {
-  font-size: 48px;
+  font-size: 36px;
+  @media  (max-width: 500px) {
+    font-size: 24px;
+  }
 }
 .valueContainer {
-  margin-top: 30px;
+  /* margin-top: 30px; */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+
 }
 
 .calcTitle {
@@ -238,7 +261,6 @@ function calculateValues() {
   background-color: white;
 }
 .disclaimer {
-  /* margin: 36px 0 0 16px; */
   margin: 10vh auto;
   font-style: italic;
   width: 40%;

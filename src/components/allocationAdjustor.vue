@@ -1,44 +1,57 @@
 <script setup>
 import { ref } from 'vue'
+
 const props = defineProps({
   exchangeData: Object,
   currencies: Array,
   allocations: Array
 })
-const emit = defineEmits(['enterClicked'])
+const emit = defineEmits(['xButtonClicked', 'updateCurrency'])
+
+function updateCurrency(index, event) {
+  const newCurrency = event.target.value
+  emit('updateCurrency', { index, newCurrency })
+}
 </script>
 
 <template>
   <div class="overlayDiv">
     <div class="assetReallocationContainer">
-      <button
-        class="xButton"
-        @click="emit('enterClicked', true)"
-      >X</button>
+      <button class="xButton" @click="emit('xButtonClicked')">X</button>
       <div class="title">Asset Reallocation Pane</div>
-      <div class="subtext">Feel free to change which currencies you're investing in here!</div>
+      <div class="subtext">
+        Feel free to change which currencies you're investing in here.
+      </div>
       <div class="currencyAdjustmentsContainer">
         <div class="currencyAdjustmentContainer">
           <div>{{ currencies[0] }} Allocation: {{ allocations[0] }}</div>
-          <select>
-            <option v-for="item in Object.keys(props.exchangeData.data.rates)">{{ item }}</option>
+          <select @change="updateCurrency(0, $event)">
+            <option 
+              v-for="item in Object.keys(props.exchangeData.data.rates)" 
+              :key="item" 
+              :value="item"
+            >
+              {{ item }}
+            </option>
           </select>
         </div>
         <div class="currencyAdjustmentContainer">
           <div>{{ currencies[1] }} Allocation: {{ allocations[1] }}</div>
-          <select>
-            <option v-for="item in Object.keys(props.exchangeData.data.rates)">{{ item }}</option>
+          <select @change="updateCurrency(1, $event)">
+            <option 
+              v-for="item in Object.keys(props.exchangeData.data.rates)" 
+              :key="item"
+              :value="item"
+            >
+              {{ item }}
+            </option>
           </select>
         </div>
       </div>
-      <!-- <div class="rangeContainer">
-        <div class="rangeHeader">Allocation Adjustment</div>
-        <input type="range" min="0" max="10">
-      </div> -->
     </div>
   </div>
-
 </template>
+
 
 <style scoped>
   .overlayDiv {

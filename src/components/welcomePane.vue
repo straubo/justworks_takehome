@@ -13,26 +13,32 @@ const emit = defineEmits(['enterClicked'])
 <style scoped>
   .welcomePane {
     width: 100%;
-    min-height: 50vh;
+    height: 60vh;
     background-color: rgba(205, 205, 205, 0.769);
     border: 1px solid black;
     border-radius: 8px;
     padding: 8px;
-    /* display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly; */
+    @media (max-width: 500px) {
+      width: 94%;
+    }
   }
   .welcomeHeader {
     font-size: 64px;
+    @media (max-width: 500px) {
+      margin-top: 24px;
+      font-size: 32px;
+    }
   }
   button {
-    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background: linear-gradient(-45deg, #c16f56, #a72b2d, #6899ab, #4fa75c);
     background-size: 400% 400%;
     animation: gradient 15s ease infinite;
     height: 10vh;
     width: 45%;
-    margin-top: 25%;
+    margin-top: 20%;
+    @media (max-width: 500px) {
+      margin-top: 40%;
+    }
   }
   @keyframes gradient {
     0% {
