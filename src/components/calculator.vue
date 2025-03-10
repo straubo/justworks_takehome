@@ -7,7 +7,7 @@ const ethConversionRate = ref(null)
 const assetValue = ref(null)
 const btcConversion = ref(0)
 const ethConversion = ref(0)
-const inputLabel = ref("Please Enter Your Desired Investment (in USD)")
+const inputLabel = ref("Investable (USD)")
 const conversions = ref([
   { 
     currency: "BTC",
@@ -71,21 +71,29 @@ function calculateValues() {
       Asset Allocation Calculator
     </div>
     <div class="formContainer">
-      <div class="inputContainer">
-        <div class="calcTitle">{{ inputLabel }}</div>
+      <TransitionGroup 
+        name="inputContainer" 
+        tag="div"
+        class="inputContainer"
+      >
+        <div 
+          class="calcTitle"
+          key="0"
+        >
+          {{ inputLabel }}</div>
         <input 
           v-model="assetValue" 
           placeholder="Input fund quantity (USD)"
           type="number"
+          :key="1"
         >
-        <transition name="fade">
-          <button 
-            class="calculateButton" 
-            @click="calculateValues"
-            v-if="assetValue"
-          >Calculate</button>
-        </transition>
-      </div>
+        <button 
+          class="calculateButton" 
+          @click="calculateValues"
+          v-if="assetValue"
+          :key="2"
+        >Calculate</button>
+      </TransitionGroup>
       <div 
         class="outputContainer"
         v-if="haveCalculated"
@@ -122,6 +130,8 @@ function calculateValues() {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   border: 1px solid black;
   border-radius: 8px;
+  display: flex;
+    flex-direction: column;
   @media (max-width: 500px) {
     width: 98%;
     padding: 4px;
@@ -169,16 +179,28 @@ function calculateValues() {
   margin: 0;
 }
 
+.inputContainer-move,
+.inputContainer-enter-active,
+.inputContainer-leave-active {
+  transition: all 0.5s ease;
+}
+.inputContainer-enter-from,
+.inputContainer-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.inputContainer-leave-active {
+  position: absolute;
+}
+
+
 .calculateButton {
   background-color: white;
   border-radius: 4px;
-}
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
+  /* width: 100%; */
+  /* this ^^ fixed positioning issue, but created a
+  sizing issue -refine if we have time */
 }
 
 .formCalculator {
