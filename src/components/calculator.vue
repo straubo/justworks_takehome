@@ -1,35 +1,15 @@
 <script setup>
-// init variables, etc
 import { ref, watch } from 'vue'
-const incomingConversionData = ref(null)
-const btcConversionRate = ref(null)
-const ethConversionRate = ref(null)
+
+// init variables, etc
 const assetValue = ref(null)
-const btcConversion = ref(0)
-const ethConversion = ref(0)
-const inputLabel = ref("Investable (USD)")
-const conversions = ref([
-  { 
-    currency: "BTC",
-    allocation: 0.7
-  },
-  {
-    currency: "ETH", 
-    allocation: 0.3
-  },
-  {
-    currency: "",
-    allocation: 0
-  },
-  {
-    currency: "",
-    allocation: 0
-  },
-  {
-    currency: "",
-    allocation: 0
-  }
-])
+const incomingConversionData = ref(null)
+const currencies = ref(["BTC", "ETH"])
+const conversionRates = ref([0, 0])
+const finalConversions = ref([0, 0])
+const conversionOne = ref(0)
+const conversionTwo = ref(0)
+const inputLabel = ref("Investable Funds (USD)")
 
 const updatedInputLabel = "Calculate another amount (in USD)"
 
@@ -46,8 +26,8 @@ async function fetchData() {
 fetchData()
 
 function updateConversionRates() {
-  btcConversionRate.value = incomingConversionData.value.data.rates.BTC
-  ethConversionRate.value = incomingConversionData.value.data.rates.ETH
+  conversionRates.value[0] = incomingConversionData.value.data.rates[currencies.value[0]]
+  conversionRates.value[1] = incomingConversionData.value.data.rates[currencies.value[1]]
 }
 
 watch(incomingConversionData, updateConversionRates)
@@ -58,9 +38,12 @@ function calculateValues() {
   const btcAllocation = assetValue.value * .7
   const ethAllocation = assetValue.value * .3
 
-  btcConversion.value = btcAllocation * btcConversionRate.value
-  ethConversion.value = ethAllocation * ethConversionRate.value
+  conversionOne.value = btcAllocation * conversionRates.value[0]
+  finalConversions.value[0] = btcAllocation * conversionRates.value[0]
+  conversionTwo.value = ethAllocation * conversionRates.value[1]
   inputLabel.value = updatedInputLabel
+  console.log(incomingConversionData.value.data.rates[currencies.value[0]])
+  console.log(incomingConversionData.value.data.rates[currencies.value[1]])
 }
 
 </script>
@@ -76,14 +59,14 @@ function calculateValues() {
         tag="div"
         class="inputContainer"
       >
-        <div 
+        <div
           class="calcTitle"
           key="0"
         >
           {{ inputLabel }}</div>
         <input 
           v-model="assetValue" 
-          placeholder="Input fund quantity (USD)"
+          placeholder="Funds"
           type="number"
           :key="1"
         >
@@ -98,16 +81,17 @@ function calculateValues() {
         class="outputContainer"
         v-if="haveCalculated"
       >
+      <div class="valuesHeader">Distributions</div>
         <div class="valueContainer">
           <div class="calcTitle">70% BTC Allocation</div>
           <div class="calcValue">
-            {{ btcConversion || "no input yet" }}
+            {{ finalConversions[0] || "no input yet" }}
           </div>
         </div>
         <div class="valueContainer">
           <div class="calcTitle">30% ETH Allocation</div>
           <div class="calcValue">
-            {{ ethConversion || "no input yet" }}
+            {{ conversionTwo || "no input yet" }}
           </div>
         </div>
       </div>
@@ -117,6 +101,7 @@ function calculateValues() {
       Please leave room for fluctuations, surcharges, or other surprises. This is not financial advice.
     </div>
   </div>
+  <div>second number: {{ finalConversions[0] }}</div>
 </template>
 
 <style scoped>
@@ -135,7 +120,8 @@ function calculateValues() {
   @media (max-width: 500px) {
     width: 98%;
     padding: 4px;
-    height: 40vh;
+    /* height: 40vh; */
+    height: auto;
   }
 }
 
@@ -201,6 +187,9 @@ function calculateValues() {
   /* width: 100%; */
   /* this ^^ fixed positioning issue, but created a
   sizing issue -refine if we have time */
+  @media (max-width: 500px) {
+    margin-top: 8px;
+  }
 }
 
 .formCalculator {
@@ -212,11 +201,26 @@ function calculateValues() {
   width: 100%; 
   height: 36px;
   padding-top: 12px;
+  margin-top: 8px;
   text-align: center;
   border: 1px solid black;
   border-radius: 5px;
 }
 
+.outputContainer {
+
+}
+
+.valuesHeader {
+  font-size: 48px;
+}
+.valueContainer {
+  margin-top: 30px;
+}
+
+.calcTitle {
+  font-weight: 700;
+}
 .disclaimer {
   margin: 36px 0 0 16px;
   font-style: italic;
