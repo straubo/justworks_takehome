@@ -3,21 +3,20 @@ import { ref } from 'vue'
 const props = defineProps({
   exchangeData: Object,
   currencies: Array,
-  conversionRates: Array, // idk if we need this here
   allocations: Array
 })
-// const rates = Object.keys(props.exchangeData.data.rates)
 const emit = defineEmits(['enterClicked'])
 </script>
 
 <template>
   <div class="overlayDiv">
     <div class="assetReallocationContainer">
-      <button 
+      <button
         class="xButton"
         @click="emit('enterClicked', true)"
       >X</button>
       <div class="title">Asset Reallocation Pane</div>
+      <div class="subtext">Feel free to change which currencies you're investing in here!</div>
       <div class="currencyAdjustmentsContainer">
         <div class="currencyAdjustmentContainer">
           <div>{{ currencies[0] }} Allocation: {{ allocations[0] }}</div>
@@ -32,10 +31,10 @@ const emit = defineEmits(['enterClicked'])
           </select>
         </div>
       </div>
-      <div class="rangeContainer">
+      <!-- <div class="rangeContainer">
         <div class="rangeHeader">Allocation Adjustment</div>
         <input type="range" min="0" max="10">
-      </div>
+      </div> -->
     </div>
   </div>
 
@@ -73,15 +72,24 @@ const emit = defineEmits(['enterClicked'])
   }
   .xButton {
     position: absolute;
+    width: 36px;
+    height: 36px;
     left: 10px;
     top: 10px;
+    border: 2px solid black;
+    border-radius: 50%;
     background-color: white;
+    padding: 0;
   }
   .assetReallocationContainer .title {
     font-size: 36px;
     @media (max-width: 500px) {
       font-size: 24px;
     }
+  }
+  .subtext {
+    width: 75%;
+    font-style: italic;
   }
   .currencyAdjustmentsContainer {
     display: flex;

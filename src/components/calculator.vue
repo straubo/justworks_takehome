@@ -77,7 +77,7 @@ function calculateValues() {
           :key="2"
         >Calculate</button>
       </TransitionGroup>
-      <div 
+      <div
         class="outputContainer"
         v-if="haveCalculated"
       >
@@ -94,7 +94,11 @@ function calculateValues() {
             {{ finalConversions[1] || "no input yet" }}
           </div>
         </div>
-        <allocationAdjustor 
+        <button
+          class="adjustButton"
+        >Adjust Positions</button>
+        <allocationAdjustor
+          v-if="adjustingAllocations"
           :exchangeData="incomingConversionData"
           :currencies="currencies"
           :conversionRates="conversionRates"
@@ -126,8 +130,9 @@ function calculateValues() {
   @media (max-width: 500px) {
     width: 98%;
     padding: 4px;
-    /* height: 40vh; */
     height: auto;
+    max-height: 90vh;
+    overflow-y: scroll;
   }
 }
 
@@ -155,7 +160,7 @@ function calculateValues() {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  height: 15vh;
+  /* height: 15vh; */
 }
 
 .inputContainer input {
@@ -227,11 +232,20 @@ function calculateValues() {
 .calcTitle {
   font-weight: 700;
 }
+
+.adjustButton {
+  margin-top: 15px;
+  background-color: white;
+}
 .disclaimer {
-  margin: 36px 0 0 16px;
+  /* margin: 36px 0 0 16px; */
+  margin: 10vh auto;
   font-style: italic;
   width: 40%;
   font-size: 16px;
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 4px;
   @media  (max-width: 500px) {
     width: 90%;
     margin: 30px auto 0;
